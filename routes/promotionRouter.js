@@ -111,10 +111,11 @@ promotionRouter.route('/:promotionId')
         Promotion.findById(req.params.promotionId)
             .then(promotion => {
                 if (promotion) {
-                    for (let i = (promotion.length - 1); i >= 0; i--) {
-                        promotionid(promotion[i]._id).remove();
-                    }
-                    promotion.save()
+                    // for (let i = (promotion.length - 1); i >= 0; i--) {
+                    //     promotionid(promotion[i]._id).remove();
+                    // }
+                    // promotion.save()
+                    promotion.remove()
                         .then(promotion => {
                             res.statusCode = 200;
                             res.setHeader('Content-Type', 'application/json');

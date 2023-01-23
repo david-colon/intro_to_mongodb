@@ -108,10 +108,11 @@ partnerRouter.route('/:partnerId')
         Partner.findById(req.params.partnerId)
             .then(partner => {
                 if (partner) {
-                    for (let i = (partner.length - 1); i >= 0; i--) {
-                        partnerid(partner[i]._id).remove();
-                    }
-                    partner.save()
+                    // for (let i = (partner.length - 1); i >= 0; i--) {
+                    //     partner(partner[i]._id).remove();
+                    // }
+                    // partner.save()
+                    partner.remove()
                         .then(partner => {
                             res.statusCode = 200;
                             res.setHeader('Content-Type', 'application/json');
