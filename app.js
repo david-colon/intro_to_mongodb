@@ -8,6 +8,8 @@ const session = require('express-session')
 // notice FileStore has two sets of arguments
 // require() returns another function and THAT function uses (session) as its args
 const FileStore = require('session-file-store')(session);
+const passport = require('passport');
+const authenticate = require('./authenticate');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -56,62 +58,24 @@ app.use(session({
   store: new FileStore()
 }));
 
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 function auth(req, res, next) {
   // the 'session' middleware automatically creates a 'session' property to the request message; let's see what it says
-  console.log(req.session);
+  console.log(req.user);
 
-  if (!req.session.user) {
-
-    // commented this out because we are no longer checking the authorization header at this point
-    // instead, we automatically redirect unauthenticated users to the '/' route IOT login
-    // const authHeader = req.headers.authorization;
-    // if (!authHeader) {
+  if (!req.user) {
     const err = new Error('You are not authenticated!');
-
-    // we no longer handle this portion in this function; it is now handled in the users.js file as part of '/users/login' 
-    // res.setHeader('WWW-Authenticate', 'Basic');
     err.status = 401;
     return next(err);
-    // }
-
-    // the following 23 lines are no longer being used since we are using sessions rather than cookies to authenticate
-    // const auth = Buffer.from(authHeader.split(' ')[1], 'base64').toString().split(':');
-    // const user = auth[0];
-    // const pass = auth[1];
-
-    // if (user === 'admin' && pass === 'password') {
-
-    //   // the below lines are commented out since cookies are being handled by Express Session
-    //   // res.cookie is a built-in method of Express's Response object
-    //   // res.cookie(name, value, [options]) is the template
-    //   // name, value are essentially key:value pair
-    //   // [options] arg is optional but tells express to use cookieParser to create a signed cookie
-    //   // we can also include things like cookie expiration time in the third arg
-    //   // res.cookie('user', 'admin', { signed: true })
-
-    //   // we write to our session that 'user' = 'admin'
-    //   req.session.user = 'admin';
-    //   return next(); // authorized
-    // } else {
-    //   const err = new Error('You are not authenticated!');
-    //   res.setHeader('WWW-Authenticate', 'Basic');
-    //   err.status = 401;
-    //   return next(err);
-    // }
 
   } else {
 
-    // 'authenticated' is an arbitrary value was set in users.js as part of '/users/login'
-    if (req.session.user === 'authenticated') {
-      return next();
-    } else {
-      const err = new Error('You are not authenticated!');
-      err.status = 401;
-      return next(err);
-    }
+    return next();
 
   }
 }
