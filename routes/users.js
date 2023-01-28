@@ -5,7 +5,7 @@ const passport = require('passport');
 const authenticate = require('../authenticate')
 
 /* GET users listing. */
-router.get('/', function (req, res, next) {
+router.get('/', authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
   res.send('respond with a resource');
 });
 
@@ -52,16 +52,14 @@ router.post('/login', passport.authenticate('local'), (req, res) => {
 
 router.get('/logout', (req, res, next) => {
   if (req.session) {
+    console.log('session exists')
     req.session.destroy();
-    // the name 'session-id' is arbitrary; we name it in app.js in the app.use(session) middleware function
     res.clearCookie('session-id')
     res.redirect('/');
   } else {
-    if (!req.session) {
-      const err = new Error('You are not logged in!');
-      err.status = 401;
-      return next(err);
-    }
+    const err = new Error('You are not logged in!');
+    err.status = 401;
+    return next(err);
   }
 });
 
