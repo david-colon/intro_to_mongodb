@@ -6,7 +6,9 @@ const authenticate = require('../authenticate')
 
 /* GET users listing. */
 router.get('/', authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
-  res.send('respond with a resource');
+  User.find()
+    .then(users = res.json(users))
+    .catch(error => res.status(500).json({ message: error.message }));
 });
 
 router.post('/signup', (req, res) => {
